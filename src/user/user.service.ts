@@ -1,7 +1,13 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { User } from './models/user.model';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { ProfileUpdateDto } from './dto/profile-update.dto';
+import { Op } from 'sequelize'; // Import Op directly from sequelize
 
 @Injectable()
 export class UserService {
@@ -39,15 +45,41 @@ export class UserService {
   /**
    * Update user profile
    */
-  async updateUser(id: string, updateData: UpdateUserDto): Promise<User> {
+  // Updated updateUser method for UserService
+  async updateUser(id: string, updateData: any): Promise<User> {
     const user = await this.findById(id);
-    
+
     if (!user) {
       throw new NotFoundException(`User with ID ${id} not found`);
     }
-    
-    await user.update(updateData);
-    return user;
+
+    // Check if email is being updated and is already in use
+    if (updateData.email && updateData.email !== user.email) {
+      const existingUser = await this.userModel.findOne({
+        where: {
+          email: updateData.email,
+          id: { [Op.ne]: id },
+        },
+      });
+
+      if (existingUser) {
+        throw new BadRequestException(
+          'Email is already in use by another account',
+        );
+      }
+    }
+
+    try {
+      // Update user with the provided data
+      await user.update(updateData);
+
+      // Fetch the updated user to ensure we return the latest data
+      const updatedUser = await this.findById(id);
+      return updatedUser;
+    } catch (error) {
+      console.error('Error updating user:', error);
+      throw new BadRequestException(`Failed to update user: ${error.message}`);
+    }
   }
 
   /**
@@ -55,12 +87,63 @@ export class UserService {
    */
   async updateAccessToken(id: string, token: string): Promise<User> {
     const user = await this.findById(id);
-    
+
     if (!user) {
       throw new NotFoundException(`User with ID ${id} not found`);
     }
-    
+
     await user.update({ access_token: token });
     return user;
+  }
+
+  /**
+   * Complete user profile setup
+   */
+  async completeProfile(
+    id: string,
+    profileData: ProfileUpdateDto,
+  ): Promise<User> {
+    const user = await this.findById(id);
+
+    if (!user) {
+      throw new NotFoundException(`User with ID ${id} not found`);
+    }
+
+    // Check if email is already in use by another user
+    if (profileData.email) {
+      const existingUser = await this.userModel.findOne({
+        where: {
+          email: profileData.email,
+          id: { [Op.ne]: id }, // Not equal to current user - fixed Op import
+        },
+      });
+
+      if (existingUser) {
+        throw new BadRequestException(
+          'Email is already in use by another account',
+        );
+      }
+    }
+
+    // Update profile data and mark as complete
+    await user.update({
+      ...profileData,
+      is_profile_complete: true,
+    });
+
+    return user;
+  }
+
+  /**
+   * Check if user's profile is complete
+   */
+  async isProfileComplete(id: string): Promise<boolean> {
+    const user = await this.findById(id);
+
+    if (!user) {
+      throw new NotFoundException(`User with ID ${id} not found`);
+    }
+
+    return user.is_profile_complete;
   }
 }

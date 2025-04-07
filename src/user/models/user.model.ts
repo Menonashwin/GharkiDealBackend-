@@ -26,6 +26,29 @@ export class User extends Model<User> {
   @Column(DataType.STRING(5))
   otp: string;
 
+  // Profile fields
+  @AllowNull(true)
+  @Column(DataType.STRING)
+  name: string;
+
+  @AllowNull(true)
+  @Column(DataType.STRING)
+  email: string;
+
+  @AllowNull(true)
+  @Column(DataType.TEXT)
+  address: string;
+
+  @AllowNull(true)
+  @Column(DataType.STRING)
+  zone: string;
+
+  // Track if profile is complete
+  @AllowNull(false)
+  @Default(false)
+  @Column(DataType.BOOLEAN)
+  is_profile_complete: boolean;
+
   @Column(DataType.DATE)
   createdAt: Date;
 

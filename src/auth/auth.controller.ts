@@ -68,6 +68,7 @@ export class AuthController {
   async verifyOtp(@Body() verifyOtpDto: VerifyOtpDto, @Res() res: Response) {
     try {
       const { ph_no, otp } = verifyOtpDto;
+      console.log('the data ------------------>', ph_no, otp);
       const user = await this.authService.verifyOtp(ph_no, otp);
       
       // Set access token in header

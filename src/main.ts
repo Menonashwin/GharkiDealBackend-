@@ -1,10 +1,20 @@
+// In your main.ts file, add this code before app.listen():
+
 import { NestFactory } from '@nestjs/core';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
+import { join } from 'path';
+import { NestExpressApplication } from '@nestjs/platform-express';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  // Create the app as a NestExpressApplication specifically
+  const app = await NestFactory.create<NestExpressApplication>(AppModule);
+
+  // Configure static files serving
+  app.useStaticAssets(join(process.cwd(), 'uploads'), {
+    prefix: '/uploads/', // This is the URL prefix
+  });
 
   const isProduction = process.env.NODE_ENV === 'production';
 
@@ -21,7 +31,7 @@ async function bootstrap() {
         description: 'Enter JWT token',
         in: 'header',
       },
-      'access-token', // This is the key used for security specification
+      'access-token'
     )
     .build();
   const document = SwaggerModule.createDocument(app, config);
@@ -30,12 +40,12 @@ async function bootstrap() {
   // Global validation pipe
   app.useGlobalPipes(
     new ValidationPipe({
-      whitelist: true, // Remove non-whitelisted properties
-      forbidNonWhitelisted: true, // Throw errors for non-whitelisted properties
-      transform: true, // Automatically transform payloads to DTO instances
-      disableErrorMessages: isProduction, // Enable detailed error messages
+      whitelist: true,
+      forbidNonWhitelisted: true,
+      transform: true,
+      disableErrorMessages: isProduction,
       validationError: {
-        target: !isProduction, // Don't expose the entire DTO in errors
+        target: !isProduction,
       },
     }),
   );

@@ -9,18 +9,10 @@ module.exports = {
         primaryKey: true,
         allowNull: false,
       },
-      email: {
-        type: Sequelize.STRING,
+      ph_no: {
+        type: Sequelize.STRING(10),
         allowNull: false,
         unique: true,
-      },
-      name: {
-        type: Sequelize.STRING,
-        allowNull: true,
-      },
-      password: {
-        type: Sequelize.STRING,
-        allowNull: false,
       },
       role: {
         type: Sequelize.STRING,
@@ -28,6 +20,10 @@ module.exports = {
       },
       access_token: {
         type: Sequelize.TEXT,
+        allowNull: true,
+      },
+      otp: {
+        type: Sequelize.STRING(5),
         allowNull: true,
       },
       createdAt: {
@@ -39,6 +35,10 @@ module.exports = {
         type: Sequelize.DATE,
         allowNull: false,
         defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
+      },
+      deletedAt: {
+        type: Sequelize.DATE,
+        allowNull: true,
       },
     });
   },

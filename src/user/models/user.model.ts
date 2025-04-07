@@ -1,7 +1,6 @@
 import { Table, Column, Model, DataType, PrimaryKey, Default, AllowNull } from 'sequelize-typescript';
-import { v4 as uuidv4 } from 'uuid';
 
-@Table({ tableName: 'users' })
+@Table({ tableName: 'users', paranoid: true })
 export class User extends Model<User> {
   @PrimaryKey
   @Default(DataType.UUIDV4)
@@ -10,18 +9,10 @@ export class User extends Model<User> {
 
   @AllowNull(false)
   @Column({
-    type: DataType.STRING,
+    type: DataType.STRING(10),
     unique: true,
   })
-  email: string;
-
-  @AllowNull(true)
-  @Column(DataType.STRING)
-  name: string;
-
-  @AllowNull(false)
-  @Column(DataType.STRING)
-  password: string;
+  ph_no: string;
 
   @AllowNull(true)
   @Column(DataType.STRING)
@@ -31,9 +22,16 @@ export class User extends Model<User> {
   @Column(DataType.TEXT)
   access_token: string;
 
+  @AllowNull(true)
+  @Column(DataType.STRING(5))
+  otp: string;
+
   @Column(DataType.DATE)
   createdAt: Date;
 
   @Column(DataType.DATE)
   updatedAt: Date;
+
+  @Column(DataType.DATE)
+  deletedAt: Date;
 }

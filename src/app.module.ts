@@ -16,6 +16,7 @@ import { UserModule } from './user/user.module';
 import { AuthGuard } from './auth/guards/auth.guard';
 import { JwtModule } from '@nestjs/jwt';
 import { User } from './user/models/user.model';
+import { GlobalUploadModule } from './common/upload/global-upload.module';
 
 @Module({
   imports: [
@@ -37,6 +38,7 @@ import { User } from './user/models/user.model';
     }),
     SequelizeModule.forFeature([Log]),
     DatabaseModule,
+    GlobalUploadModule,
     TestModule,
     LogsModule,
     AuthModule,

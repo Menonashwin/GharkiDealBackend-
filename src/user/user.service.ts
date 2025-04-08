@@ -10,6 +10,7 @@ import { UserAddress } from './models/user-address.model';
 import { CreateUserProfileDto } from './dto/create-user-profile.dto';
 import { CreateUserAddressDto } from './dto/create-user-address.dto';
 import { UpdateUserAddressDto } from './dto/update-user-address.dto';
+import { UpdateUserProfileDto } from './dto/update-user-profile.dto';
 import { Op } from 'sequelize';
 
 @Injectable()
@@ -37,6 +38,62 @@ export class UserService {
 
     return user;
   }
+
+  // Add these methods to your UserService class
+
+/**
+ * Get user profile by user ID
+ */
+async getUserProfile(userId: string): Promise<UserProfile | null> {
+  return this.userProfileModel.findOne({
+    where: { user_id: userId }
+  });
+}
+
+/**
+ * Update user profile
+ */
+async updateUserProfile(userId: string, profileData: UpdateUserProfileDto): Promise<UserProfile> {
+  // First check if user exists
+  const user = await this.userModel.findByPk(userId);
+  
+  if (!user) {
+    throw new NotFoundException(`User with ID ${userId} not found`);
+  }
+
+  // Check if profile exists
+  const profile = await this.userProfileModel.findOne({
+    where: { user_id: userId }
+  });
+  
+  if (!profile) {
+    throw new NotFoundException('Profile not found');
+  }
+
+  // Check if email is already in use by another user
+  if (profileData.email && profileData.email !== profile.email) {
+    const existingProfile = await this.userProfileModel.findOne({ 
+      where: { 
+        email: profileData.email,
+        user_id: { [Op.ne]: userId }
+      } 
+    });
+    
+    if (existingProfile) {
+      throw new BadRequestException('Email is already in use by another account');
+    }
+  }
+
+  // Update profile
+  await profile.update(profileData);
+  
+  // If zone is updated, update user zone too for consistency
+  if (profileData.zone) {
+    await user.update({ zone: profileData.zone });
+  }
+
+  return profile;
+}
 
   /**
    * Find user by phone number

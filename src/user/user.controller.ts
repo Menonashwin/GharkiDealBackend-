@@ -28,6 +28,7 @@ import { UserProfile } from './models/user-profile.model';
 import { UserAddress } from './models/user-address.model';
 import { GlobalUploadService } from '../common/upload/global-upload.service';
 import { SingleFileUpload } from '../common/upload/file-upload.decorators';
+import { UpdateUserProfileDto } from './dto/update-user-profile.dto';
 import { Request } from 'express';
 
 @ApiBearerAuth('access-token')
@@ -87,6 +88,43 @@ export class UserController {
       throw new BadRequestException(`Failed to update profile: ${error.message}`);
     }
   }
+
+
+  // Add this method to your UserController class
+
+@Put('profile')
+@ApiOperation({ summary: 'Update existing user profile' })
+@ApiResponse({ status: 200, description: 'Profile updated', type: UserProfileResponseDto })
+async updateProfile(
+  @CurrentUser() user: JwtUserPayload,
+  @IsUser() isUser: boolean,
+  @Body() profileData: UpdateUserProfileDto
+): Promise<UserProfile> {
+  if (!isUser) {
+    throw new BadRequestException('This endpoint is only for regular users');
+  }
+  
+  try {
+    // First check if profile exists
+    const existingProfile = await this.userService.getUserProfile(user.sub);
+    
+    if (!existingProfile) {
+      throw new BadRequestException('Profile not found. Please create a profile first');
+    }
+    
+    // Update the profile
+    const profile = await this.userService.updateUserProfile(user.sub, profileData);
+    return profile;
+  } catch (error) {
+    if (error instanceof BadRequestException) {
+      throw error;
+    }
+    if (error.name === 'SequelizeUniqueConstraintError') {
+      throw new ConflictException('Email is already in use');
+    }
+    throw new BadRequestException(`Failed to update profile: ${error.message}`);
+  }
+}
 
   @Post('profile-image')
   @ApiOperation({ summary: 'Upload profile image' })

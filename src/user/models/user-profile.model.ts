@@ -29,6 +29,10 @@ export class UserProfile extends Model<UserProfile> {
   @Column(DataType.STRING)
   profile_image_url: string;
 
+  @AllowNull(true)
+  @Column(DataType.STRING)
+  zone: string;
+
   @Column(DataType.DATE)
   createdAt: Date;
 

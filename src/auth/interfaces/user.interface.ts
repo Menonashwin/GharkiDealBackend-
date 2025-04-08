@@ -1,10 +1,10 @@
 // src/auth/interfaces/user.interface.ts
-import { UserRole } from '../dto/phone-auth.dto';
+import { UserType } from '../dto/phone-auth.dto';
 
 export interface JwtUserPayload {
   ph_no: string;      // Phone number
   sub: string;        // User ID (UUID)
-  role: UserRole;     // User role
+  user_type: UserType; // User type (user or service_provider)
   iat?: number;       // Issued at
   exp?: number;       // Expiration
 }

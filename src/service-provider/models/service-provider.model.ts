@@ -1,10 +1,9 @@
-// src/user/models/user.model.ts
-import { Table, Column, Model, DataType, PrimaryKey, Default, AllowNull, HasMany, HasOne } from 'sequelize-typescript';
-import { UserProfile } from './user-profile.model';
-import { UserAddress } from './user-address.model';
+// src/service-provider/models/service-provider.model.ts
+import { Table, Column, Model, DataType, PrimaryKey, Default, AllowNull, HasOne } from 'sequelize-typescript';
+import { ServiceProviderProfile } from './service-provider-profile.model';
 
-@Table({ tableName: 'users', paranoid: true })
-export class User extends Model<User> {
+@Table({ tableName: 'service_providers', paranoid: true })
+export class ServiceProvider extends Model<ServiceProvider> {
   @PrimaryKey
   @Default(DataType.UUIDV4)
   @Column(DataType.UUID)
@@ -30,9 +29,10 @@ export class User extends Model<User> {
   @Column(DataType.BOOLEAN)
   is_profile_complete: boolean;
 
-  @AllowNull(true)
-  @Column(DataType.STRING)
-  zone: string;
+  @AllowNull(false)
+  @Default(false)
+  @Column(DataType.BOOLEAN)
+  is_verified: boolean;
 
   @Column(DataType.DATE)
   createdAt: Date;
@@ -44,10 +44,6 @@ export class User extends Model<User> {
   deletedAt: Date;
 
   // Relationship with profile
-  @HasOne(() => UserProfile)
-  profile: UserProfile;
-
-  // Relationship with addresses
-  @HasMany(() => UserAddress)
-  addresses: UserAddress[];
+  @HasOne(() => ServiceProviderProfile)
+  profile: ServiceProviderProfile;
 }

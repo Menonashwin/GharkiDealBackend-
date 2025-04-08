@@ -2,7 +2,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsString, Length, Matches, IsEnum, IsOptional } from 'class-validator';
 
-export enum UserRole {
+export enum UserType {
   USER = 'user',
   SERVICE_PROVIDER = 'service_provider'
 }
@@ -18,14 +18,14 @@ export class PhoneAuthDto {
   ph_no: string;
   
   @ApiProperty({
-    description: 'User role',
+    description: 'User type',
     example: 'user',
-    enum: UserRole,
-    default: UserRole.USER
+    enum: UserType,
+    default: UserType.USER
   })
-  @IsEnum(UserRole)
+  @IsEnum(UserType)
   @IsOptional()
-  role?: UserRole = UserRole.USER;
+  user_type?: UserType = UserType.USER;
 }
 
 export class VerifyOtpDto {
@@ -46,6 +46,16 @@ export class VerifyOtpDto {
   @Length(5, 5)
   @Matches(/^[0-9]+$/, { message: 'OTP must contain only digits' })
   otp: string;
+  
+  @ApiProperty({
+    description: 'User type',
+    example: 'user',
+    enum: UserType,
+    default: UserType.USER
+  })
+  @IsEnum(UserType)
+  @IsOptional()
+  user_type?: UserType = UserType.USER;
 }
 
 export class UserResponseDto {
@@ -56,10 +66,39 @@ export class UserResponseDto {
   ph_no: string;
 
   @ApiProperty({
-    enum: UserRole,
-    example: UserRole.USER
+    enum: UserType,
+    example: UserType.USER
   })
-  role: UserRole;
+  user_type: UserType;
+
+  @ApiProperty()
+  is_profile_complete: boolean;
+
+  @ApiProperty()
+  createdAt: Date;
+
+  @ApiProperty()
+  updatedAt: Date;
+}
+
+export class ServiceProviderResponseDto {
+  @ApiProperty()
+  id: string;
+
+  @ApiProperty()
+  ph_no: string;
+
+  @ApiProperty({
+    enum: UserType,
+    example: UserType.SERVICE_PROVIDER
+  })
+  user_type: UserType;
+
+  @ApiProperty()
+  is_profile_complete: boolean;
+
+  @ApiProperty()
+  is_verified: boolean;
 
   @ApiProperty()
   createdAt: Date;

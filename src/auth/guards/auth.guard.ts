@@ -1,3 +1,4 @@
+// src/auth/guards/auth.guard.ts
 import {
   Injectable,
   CanActivate,
@@ -9,6 +10,8 @@ import { Request } from 'express';
 import { Reflector } from '@nestjs/core';
 import { IS_PUBLIC_KEY } from '../decorators/public.decorator';
 import { ConfigService } from '@nestjs/config';
+import { JwtUserPayload } from '../interfaces/user.interface';
+import { UserType } from '../dto/phone-auth.dto';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
@@ -31,18 +34,23 @@ export class AuthGuard implements CanActivate {
     const request = context.switchToHttp().getRequest();
     const token = this.extractTokenFromHeader(request);
 
-    // console.log(token);
     if (!token) {
       throw new UnauthorizedException('No token provided');
     }
 
     try {
-      const payload = await this.jwtService.verifyAsync(token, {
+      const payload = await this.jwtService.verifyAsync<JwtUserPayload>(token, {
         secret: this.configService.get<string>('JWT_SECRET'),
       });
+      
+      // Add the payload to the request
       request['user'] = payload;
+      
+      // Add a convenience flag to check user type
+      request['isUser'] = payload.user_type === UserType.USER;
+      request['isServiceProvider'] = payload.user_type === UserType.SERVICE_PROVIDER;
     } catch(e) {
-      console.log(e)
+      console.log('Token verification error:', e);
       throw new UnauthorizedException('Invalid token');
     }
 

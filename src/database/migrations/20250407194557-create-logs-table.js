@@ -1,16 +1,18 @@
-// src/database/migrations/XXXX-create-logs-table.js
+'use strict';
+
 module.exports = {
-  up: (queryInterface, Sequelize) => {
-    return queryInterface.createTable('logs', {
+  up: async (queryInterface, Sequelize) => {
+    await queryInterface.createTable('logs', {
       id: {
         type: Sequelize.UUID,
-        primaryKey: true,
         defaultValue: Sequelize.UUIDV4,
+        primaryKey: true,
+        allowNull: false,
       },
       timestamp: {
         type: Sequelize.DATE,
+        defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
         allowNull: false,
-        defaultValue: Sequelize.NOW,
       },
       method: {
         type: Sequelize.STRING(10),
@@ -30,18 +32,10 @@ module.exports = {
       },
       ip_address: {
         type: Sequelize.STRING(45),
-        allowNull: false,
+        allowNull: true,
       },
       user_agent: {
         type: Sequelize.TEXT,
-        allowNull: true,
-      },
-      user_id: {
-        type: Sequelize.UUID,
-        allowNull: true,
-      },
-      request_body: {
-        type: Sequelize.JSONB,
         allowNull: true,
       },
       error_message: {
@@ -60,7 +54,8 @@ module.exports = {
       },
     });
   },
-  down: (queryInterface) => {
-    return queryInterface.dropTable('logs');
+
+  down: async (queryInterface) => {
+    await queryInterface.dropTable('logs');
   },
 };

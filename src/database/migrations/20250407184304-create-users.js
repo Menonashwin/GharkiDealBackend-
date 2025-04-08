@@ -14,16 +14,21 @@ module.exports = {
         allowNull: false,
         unique: true,
       },
-      role: {
-        type: Sequelize.STRING,
-        allowNull: true,
-      },
       access_token: {
         type: Sequelize.TEXT,
         allowNull: true,
       },
       otp: {
         type: Sequelize.STRING(5),
+        allowNull: true,
+      },
+      is_profile_complete: {
+        type: Sequelize.BOOLEAN,
+        allowNull: false,
+        defaultValue: false,
+      },
+      zone: {
+        type: Sequelize.STRING,
         allowNull: true,
       },
       createdAt: {

@@ -1,17 +1,14 @@
 // src/user/dto/update-user.dto.ts
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString, IsOptional } from 'class-validator';
+import { IsBoolean, IsOptional } from 'class-validator';
 
 export class UpdateUserDto {
   @ApiProperty({
-    description: 'User role',
-    example: 'customer',
+    description: 'Profile completion status',
+    example: true,
     required: false
   })
-  @IsString()
+  @IsBoolean()
   @IsOptional()
-  role?: string;
-  
-  // You can add more fields here that users are allowed to update
-  // For example: name, avatar, preferences, etc.
+  is_profile_complete?: boolean;
 }

@@ -6,11 +6,12 @@ import {
   HttpCode, 
   HttpStatus, 
   Res, 
-  BadRequestException
+  BadRequestException,
+  NotFoundException
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { PhoneAuthDto, VerifyOtpDto, UserResponseDto } from './dto/phone-auth.dto';
+import { PhoneAuthDto, VerifyOtpDto, UserResponseDto, ServiceProviderResponseDto, UserType } from './dto/phone-auth.dto';
 import { Public } from './decorators/public.decorator';
 import { Response } from 'express';
 
@@ -35,20 +36,22 @@ export class AuthController {
   })
   async phoneAuth(@Body() phoneAuthDto: PhoneAuthDto, @Res() res: Response) {
     try {
-      const user = await this.authService.authenticatePhone(phoneAuthDto);
+      const entity = await this.authService.authenticatePhone(phoneAuthDto);
       
       // Set access token in header
-      res.setHeader('Authorization', `Bearer ${user.access_token}`);
+      res.setHeader('Authorization', `Bearer ${entity.access_token}`);
       
-      // Return user details with OTP and role
+      // Return entity details with OTP and user_type
       return res.json({
-        id: user.id,
-        ph_no: user.ph_no,
-        role: user.role,
-        otp: user.otp, // In production, don't return OTP in response
+        id: entity.id,
+        ph_no: entity.ph_no,
+        user_type: phoneAuthDto.user_type || UserType.USER,
+        is_profile_complete: entity.is_profile_complete,
+        otp: entity.otp, // In production, don't return OTP in response
         message: 'OTP has been generated successfully'
       });
     } catch (error) {
+      console.error('Phone authentication error:', error);
       return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
         message: 'Failed to process phone authentication',
         error: error.message
@@ -67,20 +70,31 @@ export class AuthController {
   })
   async verifyOtp(@Body() verifyOtpDto: VerifyOtpDto, @Res() res: Response) {
     try {
-      const { ph_no, otp } = verifyOtpDto;
-      const user = await this.authService.verifyOtp(ph_no, otp);
+      const entity = await this.authService.verifyOtp(verifyOtpDto);
       
       // Set access token in header
-      res.setHeader('Authorization', `Bearer ${user.access_token}`);
+      res.setHeader('Authorization', `Bearer ${entity.access_token}`);
       
       // Remove sensitive data before returning
-      const { otp: _, access_token: __, ...result } = user.get({ plain: true });
+      const { otp: _, access_token: __, ...result } = entity.get({ plain: true });
       
-      return res.json({
+      // Add user_type to the response
+      const response = {
         ...result,
+        user_type: verifyOtpDto.user_type || UserType.USER,
         message: 'OTP verified successfully'
-      });
+      };
+      
+      return res.json(response);
     } catch (error) {
+      console.error('OTP verification error:', error);
+      
+      if (error instanceof NotFoundException) {
+        return res.status(HttpStatus.NOT_FOUND).json({
+          message: error.message
+        });
+      }
+      
       if (error instanceof BadRequestException) {
         return res.status(HttpStatus.BAD_REQUEST).json({
           message: error.message

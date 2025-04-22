@@ -46,9 +46,9 @@ import { Public } from 'src/auth/decorators/public.decorator';
     @ApiResponse({ status: 200, description: 'Service provider profile', type: ProviderProfileResponseDto })
     @Public()
     async getProfile(@CurrentUser() user: JwtUserPayload, @IsServiceProvider() isProvider: boolean): Promise<any> {
-      if (!isProvider) {
-        throw new BadRequestException('This endpoint is only for service providers');
-      }
+      // if (!isProvider) {
+      //   throw new BadRequestException('This endpoint is only for service providers');
+      // }
       
       const providerWithDetails = await this.serviceProviderService.findById(user.sub);
       

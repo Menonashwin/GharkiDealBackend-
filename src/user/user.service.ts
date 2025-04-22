@@ -192,7 +192,7 @@ async updateUserProfile(userId: string, profileData: UpdateUserProfileDto): Prom
     let profile = await this.userProfileModel.findOne({
       where: { user_id: userId },
     });
-
+   
     if (profile) {
       // Update existing profile with image URL
       await profile.update({ profile_image_url: imageUrl });

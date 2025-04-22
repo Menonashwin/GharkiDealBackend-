@@ -44,6 +44,7 @@ import { Public } from 'src/auth/decorators/public.decorator';
     @Get('profile')
     @ApiOperation({ summary: 'Get current service provider profile' })
     @ApiResponse({ status: 200, description: 'Service provider profile', type: ProviderProfileResponseDto })
+    @Public()
     async getProfile(@CurrentUser() user: JwtUserPayload, @IsServiceProvider() isProvider: boolean): Promise<any> {
       if (!isProvider) {
         throw new BadRequestException('This endpoint is only for service providers');

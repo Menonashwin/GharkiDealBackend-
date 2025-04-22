@@ -69,10 +69,10 @@ async getAllServiceProviders(
     
     // Query with filtering and pagination
     const { rows, count } = await this.serviceProviderModel.findAndCountAll({
-      where: {
-        is_profile_complete: true,
-        is_verified: true, // Only show verified providers
-      },
+      // where: {
+      //   is_profile_complete: true,
+      //   is_verified: true, 
+      // },
       include: [
         { 
           model: ServiceProviderProfile,

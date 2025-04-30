@@ -30,7 +30,9 @@ import { GlobalUploadService } from '../common/upload/global-upload.service';
 import { SingleFileUpload } from '../common/upload/file-upload.decorators';
 import { UpdateUserProfileDto } from './dto/update-user-profile.dto';
 import { Request } from 'express';
+import { Public } from 'src/auth/decorators/public.decorator';
 
+@Public()
 @ApiBearerAuth('access-token')
 @ApiTags('users')
 @Controller('users')

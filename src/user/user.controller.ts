@@ -47,9 +47,9 @@ export class UserController {
   @ApiOperation({ summary: 'Get current user profile with addresses' })
   @ApiResponse({ status: 200, description: 'User profile', type: UserResponseDto })
   async getProfile(@CurrentUser() user: JwtUserPayload, @IsUser() isUser: boolean): Promise<any> {
-    if (!isUser) {
-      throw new BadRequestException('This endpoint is only for regular users');
-    }
+    // if (!isUser) {
+    //   throw new BadRequestException('This endpoint is only for regular users');
+    // }
     
     const userWithDetails = await this.userService.findById(user.sub);
     

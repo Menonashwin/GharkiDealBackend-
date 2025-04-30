@@ -32,7 +32,7 @@ import { UpdateUserProfileDto } from './dto/update-user-profile.dto';
 import { Request } from 'express';
 import { Public } from 'src/auth/decorators/public.decorator';
 
-@Public()
+
 @ApiBearerAuth('access-token')
 @ApiTags('users')
 @Controller('users')
@@ -42,6 +42,7 @@ export class UserController {
     private readonly globalUploadService: GlobalUploadService
   ) {}
 
+  @Public()
   @Get('profile')
   @ApiOperation({ summary: 'Get current user profile with addresses' })
   @ApiResponse({ status: 200, description: 'User profile', type: UserResponseDto })

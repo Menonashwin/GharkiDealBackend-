@@ -18,6 +18,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { User } from './user/models/user.model';
 import { GlobalUploadModule } from './common/upload/global-upload.module';
 import { ServiceProviderModule } from './service-provider/service-provider.module';
+import { BookingModule } from './booking/booking.module';
 
 @Module({
   imports: [
@@ -44,7 +45,7 @@ import { ServiceProviderModule } from './service-provider/service-provider.modul
     LogsModule,
     AuthModule,
     UserModule,
-    
+    BookingModule,
     ServiceProviderModule,
   ],
   controllers: [AppController],
